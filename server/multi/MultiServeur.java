@@ -8,17 +8,17 @@ import java.util.*;
 import core.CoreLinda;
 import server.IRemoteCallback;
 import server.LocalToRemoteCallback;
-import server.ILindaServer;
+import server.LindaServer;
 import utils.Linda;
 import utils.Tuple;
 
 import static java.lang.Integer.parseInt;
 
 /* TODO : take doit bloquer le client et pas le serveur */
-public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
+public class MultiServeur extends UnicastRemoteObject implements LindaServer {
 
     private CoreLinda localLinda;
-    private ArrayList<ILindaServer> serveursConectes;
+    private ArrayList<LindaServer> serveursConectes;
     private String adressePerso;
 
     private boolean verbeux = true;
@@ -63,7 +63,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         System.out.println("lancement du serveur");
         try {
             multiServeur = new MultiServeur(adresse);
-            Registry registry = LocateRegistry.createRegistry(port);
+            LocateRegistry.createRegistry(port);
             Naming.rebind(adresse, multiServeur);
             System.out.println("Serveur lancé à l'adresse : " + adresse);
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
     public void connecterServeur(String dest, boolean retour) throws RemoteException{
         System.out.println("Connexion au serveur " + dest + " ...");
         try {
-            ILindaServer ls = (ILindaServer) Naming.lookup(dest);
+            LindaServer ls = (LindaServer) Naming.lookup(dest);
             this.serveursConectes.add(ls);
             System.out.println("Connecté au serveur " + dest);
             if (retour)
@@ -140,7 +140,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         if (propagation)
         {
             if (solution == null) {
-                for (ILindaServer s: serveursConectes) {
+                for (LindaServer s: serveursConectes) {
                     solution = s.tryTake(template,false);
                     if (solution != null) {
                         break;
@@ -163,7 +163,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         {
             if (solution == null) {
                 if (verbeux) System.out.println("Non trouvé sur place : " + template);
-                for (ILindaServer s: serveursConectes) {
+                for (LindaServer s: serveursConectes) {
                     if (verbeux) System.out.println("Recherche de : " + template +  " sur le serveur : " + s);
                     solution = s.tryRead(template,false);
                     if (solution != null) {
@@ -188,7 +188,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         if (verbeux) System.out.println("TakeAll : " + template);
         Collection<Tuple> c = this.localLinda.takeAll(template);
         if (propagation) {
-            for (ILindaServer s: serveursConectes) {
+            for (LindaServer s: serveursConectes) {
                 if (verbeux) System.out.println("takeAll : " + template + "sur le serveur :" + s);
                 try {
                     c.addAll(s.takeAll(template,false));
@@ -212,7 +212,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         if (verbeux) System.out.println("readAll : " + template);
         Collection<Tuple> c = this.localLinda.readAll(template);
         if (propagation) {
-            for (ILindaServer s: serveursConectes) {
+            for (LindaServer s: serveursConectes) {
                 if (verbeux) System.out.println("readAll : " + template + "sur le serveur : " + s);
                 try {
                     c.addAll(s.readAll(template,false));
@@ -238,7 +238,7 @@ public class MultiServeur extends UnicastRemoteObject implements ILindaServer {
         this.localLinda.eventRegister(mode, timing, template, cb);
         if (propagation)
         {
-            for (ILindaServer s: serveursConectes)
+            for (LindaServer s: serveursConectes)
             {
                 s.eventRegister(mode,timing,template, callbackRmt,false);
             }

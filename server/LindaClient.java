@@ -14,7 +14,7 @@ import java.util.Collection;
 public class LindaClient implements Linda {
 
     /* on se connecte au serveur à la création du client et on garde la co tant que l'objet existe */
-    private ILindaServer lindaServ;
+    private LindaServer lindaServ;
     private boolean verbeux = true;
 
     /** Initializes the Linda implementation.
@@ -22,9 +22,11 @@ public class LindaClient implements Linda {
      */
     public LindaClient(String serverURI) {
         try {
-            System.out.println("Connexion au serveur " + serverURI + " ...");
-            this.lindaServ = (ILindaServer) Naming.lookup(serverURI);
-            System.out.println("Connecté au serveur :" + serverURI);
+            if (verbeux)
+                System.out.println("Connexion au serveur " + serverURI + " ...");
+            this.lindaServ = (LindaServer) Naming.lookup(serverURI);
+            if (verbeux)
+                System.out.println("Connecté au serveur :" + serverURI);
         } catch (Exception ex) {
             System.out.println("La connexion a échoué");
             ex.printStackTrace();
@@ -35,14 +37,7 @@ public class LindaClient implements Linda {
      *  the URI of the server is : //localhost:4000/LindaServer
      */
     public LindaClient() {
-        try {
-            System.out.println("Connexion au serveur //localhost:4000/LindaServer");
-            this.lindaServ = (ILindaServer) Naming.lookup("//localhost:4000/LindaServer");
-            System.out.println("Connecté au serveur : " + "//localhost:4000/LindaServer");
-        } catch (Exception ex) {
-            System.out.println("La connexion a échoué");
-            ex.printStackTrace();
-        }
+        new LindaClient("//localhost:4000/LindaServer");
     }
 
     /* ici on appelle les méthodes sur l'objet à distance */
@@ -136,7 +131,8 @@ public class LindaClient implements Linda {
 
     public void debug(String prefix){
         this.verbeux = true;
-        System.out.println("Client mis en mode debug avec le prefix : " + prefix);
+        if (verbeux)
+            System.out.println("Client mis en mode debug avec le prefix : " + prefix);
     }
 
 }
