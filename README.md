@@ -24,6 +24,13 @@ There are two sub-packages that add tweaks to the existing server :
  - multi-server, that connects multiple server each accessible from outside and from the other servers
  - cache, the <code>LindaCient</code> now has a cache on 
 
+
+## Usage example
+
+The <code>application</code> sub-package in the <code>utils</code> package gives an example of the use this server can have.
+
+It illustrates the posibilities the callback class allows.
+
 ## Improvements
 
 The <code>CoreLinda</code> class should implements a better more efficient storage system for large quantity of data.

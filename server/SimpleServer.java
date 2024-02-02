@@ -16,7 +16,7 @@ public class SimpleServer extends UnicastRemoteObject implements LindaServer {
     String prefix;
 
     /**
-     * Main pour lancer le serveur
+     * Main pour lancer le serveur. Possible arguments are "-v" and "server address"
      * @param args adresse serveur
      */
     public static void main(String[] args) {
